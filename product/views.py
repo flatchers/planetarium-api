@@ -1,9 +1,14 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from product.models import PlanetariumDome, ShowTheme, AstronomyShow, Reservation
-from product.serializers import PlanetariumDomeSerializer, ShowThemeSerializer, AstronomyShowSerializer, \
-    ReservationSerializer
+from product.models import PlanetariumDome, ShowTheme, AstronomyShow, Reservation, ShowSession
+from product.serializers import (
+    PlanetariumDomeSerializer,
+    ShowThemeSerializer,
+    AstronomyShowSerializer,
+    ReservationSerializer,
+    ShowSessionSerializer,
+)
 
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
@@ -19,6 +24,11 @@ class ShowThemeViewSet(viewsets.ModelViewSet):
 class AstronomyShowViewSet(viewsets.ModelViewSet):
     queryset = AstronomyShow.objects.all()
     serializer_class = AstronomyShowSerializer
+
+
+class ShowSessionViewSet(viewsets.ModelViewSet):
+    queryset = ShowSession.objects.all()
+    serializer_class = ShowSessionSerializer
 
 
 class ReservationViewSet(viewsets.ModelViewSet):

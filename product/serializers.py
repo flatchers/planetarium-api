@@ -5,7 +5,8 @@ from product.models import (
     ShowTheme,
     AstronomyShow,
     Reservation,
-    Ticket
+    Ticket,
+    ShowSession
 )
 
 
@@ -24,6 +25,12 @@ class ShowThemeSerializer(serializers.ModelSerializer):
 class AstronomyShowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AstronomyShow
+        fields = "__all__"
+
+
+class ShowSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShowSession
         fields = "__all__"
 
 
