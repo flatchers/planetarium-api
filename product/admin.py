@@ -5,7 +5,8 @@ from product.models import (
     ShowTheme,
     AstronomyShow,
     Reservation,
-    Ticket
+    Ticket,
+    ShowSession
 )
 
 admin.site.register(PlanetariumDome)
@@ -13,3 +14,4 @@ admin.site.register(ShowTheme)
 admin.site.register(AstronomyShow)
 admin.site.register(Reservation)
 admin.site.register(Ticket)
+admin.site.register(ShowSession)
