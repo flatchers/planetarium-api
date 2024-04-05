@@ -51,6 +51,11 @@ class ShowSessionListSerializer(ShowSessionSerializer):
     planetarium_dome = serializers.CharField(source="planetarium_dome.name", read_only=True)
 
 
+class ShowSessionDetailSerializer(ShowSessionSerializer):
+    astronomy_show = AstronomyShowListSerializer(many=False, read_only=True)
+    planetarium_dome = PlanetariumDomeSerializer(many=False, read_only=True)
+
+
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket

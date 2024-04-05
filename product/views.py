@@ -1,13 +1,23 @@
 from django.shortcuts import render
 from rest_framework import viewsets
 
-from product.models import PlanetariumDome, ShowTheme, AstronomyShow, Reservation, ShowSession
+from product.models import (
+    PlanetariumDome,
+    ShowTheme,
+    AstronomyShow,
+    Reservation,
+    ShowSession
+)
 from product.serializers import (
     PlanetariumDomeSerializer,
     ShowThemeSerializer,
     AstronomyShowSerializer,
     ReservationSerializer,
-    ShowSessionSerializer, AstronomyShowListSerializer, AstronomyShowDetailSerializer, ShowSessionListSerializer,
+    ShowSessionSerializer,
+    AstronomyShowListSerializer,
+    AstronomyShowDetailSerializer,
+    ShowSessionListSerializer,
+    ShowSessionDetailSerializer,
 )
 
 
@@ -41,6 +51,8 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ShowSessionListSerializer
+        if self.action == "retrieve":
+            return ShowSessionDetailSerializer
         return self.serializer_class
 
 
