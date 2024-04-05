@@ -8,6 +8,10 @@ class PlanetariumDome(models.Model):
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
 
+    @property
+    def capacity(self):
+        return self.rows * self.seats_in_row
+
     def __str__(self):
         return f"{self.name} (rows: {self.rows}, seats: {self.seats_in_row})"
 
@@ -22,7 +26,7 @@ class ShowTheme(models.Model):
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    show_theme = models.ManyToManyField(ShowTheme, related_name="astronomy_shows", blank=True)
+    show_theme = models.ManyToManyField(ShowTheme, related_name="astronomy_shows", null=False)
 
     def __str__(self):
         return f"title: {self.title}, theme: {self.show_theme}"

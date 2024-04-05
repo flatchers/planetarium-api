@@ -13,25 +13,33 @@ from product.models import (
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlanetariumDome
-        fields = "__all__"
+        fields = ("id", "name", "rows", "seats_in_row", "capacity")
 
 
 class ShowThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShowTheme
-        fields = "__all__"
+        fields = ("id", "name")
 
 
 class AstronomyShowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AstronomyShow
-        fields = "__all__"
+        fields = ("id", "title", "description", "show_theme")
+
+
+class AstronomyShowListSerializer(AstronomyShowSerializer):
+    show_theme = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="name"
+     )
 
 
 class ShowSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShowSession
-        fields = "__all__"
+        fields = ("id", "astronomy_show", "planetarium_dome", "show_time")
 
 
 class TicketSerializer(serializers.ModelSerializer):
