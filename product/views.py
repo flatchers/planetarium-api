@@ -7,7 +7,7 @@ from product.serializers import (
     ShowThemeSerializer,
     AstronomyShowSerializer,
     ReservationSerializer,
-    ShowSessionSerializer, AstronomyShowListSerializer,
+    ShowSessionSerializer, AstronomyShowListSerializer, AstronomyShowDetailSerializer,
 )
 
 
@@ -28,6 +28,8 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return AstronomyShowListSerializer
+        if self.action == "retrieve":
+            return AstronomyShowDetailSerializer
         else:
             return AstronomyShowSerializer
 
