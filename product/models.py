@@ -29,7 +29,7 @@ class AstronomyShow(models.Model):
     show_theme = models.ManyToManyField(ShowTheme, related_name="astronomy_shows", null=False)
 
     def __str__(self):
-        return f"title: {self.title}, theme: {self.show_theme}"
+        return f"title: {self.title}, theme: {', '.join(self.show_theme.values_list('name', flat=True))}"
 
 
 class ShowSession(models.Model):
@@ -55,7 +55,7 @@ class Reservation(models.Model):
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    show_session = models.ForeignKey(ShowSession, on_delete=models.CASCADE)
+    show_session = models.ForeignKey(ShowSession, on_delete=models.CASCADE, related_name="tickets")
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="tickets")
 
     def __str__(self):

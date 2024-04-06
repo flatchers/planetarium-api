@@ -50,10 +50,24 @@ class ShowSessionListSerializer(ShowSessionSerializer):
     astronomy_show = serializers.CharField(source="astronomy_show.title", read_only=True)
     planetarium_dome = serializers.CharField(source="planetarium_dome.name", read_only=True)
 
+    class Meta:
+        model = ShowSession
+        fields = ("id", "astronomy_show", "planetarium_dome", "show_time")
+
 
 class ShowSessionDetailSerializer(ShowSessionSerializer):
-    astronomy_show = AstronomyShowListSerializer(many=False, read_only=True)
+    astronomy_show = AstronomyShowDetailSerializer(many=False, read_only=True)
     planetarium_dome = PlanetariumDomeSerializer(many=False, read_only=True)
+    taken_seats = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field="seat",
+        source="tickets",
+    )
+
+    class Meta:
+        model = ShowSession
+        fields = ("id", "astronomy_show", "planetarium_dome", "show_time", "taken_seats")
 
 
 class TicketSerializer(serializers.ModelSerializer):

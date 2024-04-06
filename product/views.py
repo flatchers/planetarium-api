@@ -53,7 +53,8 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             return ShowSessionListSerializer
         if self.action == "retrieve":
             return ShowSessionDetailSerializer
-        return self.serializer_class
+        else:
+            return self.serializer_class
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
