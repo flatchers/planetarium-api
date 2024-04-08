@@ -11,9 +11,11 @@ from product.models import (
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
+    num_seats = serializers.IntegerField(source="capacity")
+
     class Meta:
         model = PlanetariumDome
-        fields = ("id", "name", "rows", "seats_in_row", "capacity")
+        fields = ("id", "name", "rows", "seats_in_row", "num_seats")
 
 
 class ShowThemeSerializer(serializers.ModelSerializer):
@@ -47,12 +49,23 @@ class ShowSessionSerializer(serializers.ModelSerializer):
 
 
 class ShowSessionListSerializer(ShowSessionSerializer):
-    astronomy_show = serializers.CharField(source="astronomy_show.title", read_only=True)
-    planetarium_dome = serializers.CharField(source="planetarium_dome.name", read_only=True)
+    astronomy_show_title = serializers.CharField(source="astronomy_show.title", read_only=True)
+    planetarium_dome_name = serializers.CharField(source="planetarium_dome.name", read_only=True)
+    planetarium_dome_capacity = serializers.CharField(source="planetarium_dome.num_seats", read_only=True)
+    taken_tickets = serializers.IntegerField(source="tickets.count", read_only=True)
+    tickets_available = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = ShowSession
-        fields = ("id", "astronomy_show", "planetarium_dome", "show_time")
+        fields = (
+            "id",
+            "astronomy_show_title",
+            "planetarium_dome_name",
+            "planetarium_dome_capacity",
+            "taken_tickets",
+            "tickets_available",
+            "show_time",
+        )
 
 
 class ShowSessionDetailSerializer(ShowSessionSerializer):
@@ -71,9 +84,18 @@ class ShowSessionDetailSerializer(ShowSessionSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "show_session")
+
+    def validate(self, attrs):
+        if not (1 <= attrs["row"] <= attrs["show_session"].planetarium_dome.num_seats):
+            raise serializers.ValidationError(
+                {
+                    "seat": f"The seat number must be between 1 and {attrs['show_session'].planetarium_dome.num_seats}"
+                }
+            )
 
 
 class ReservationSerializer(serializers.ModelSerializer):
