@@ -1,12 +1,13 @@
+from django.db.models import Count, F
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, pagination
 
 from product.models import (
     PlanetariumDome,
     ShowTheme,
     AstronomyShow,
     Reservation,
-    ShowSession
+    ShowSession,
 )
 from product.serializers import (
     PlanetariumDomeSerializer,
@@ -56,10 +57,31 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         else:
             return self.serializer_class
 
+    def get_queryset(self):
+        queryset = self.queryset
+
+        if self.action in "list":
+            queryset = (
+                queryset
+                .select_related()
+                .annotate(tickets_available=F("planetarium_dome__rows") * F("planetarium_dome__seats_in_row") - Count("tickets"))
+            )
+        if self.action == "retrieve":
+            queryset = queryset.select_related()
+
+        return queryset
+
+
+class ResevationPagination(pagination.PageNumberPagination):
+    page_size = 10
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
 
 class ReservationViewSet(viewsets.ModelViewSet):
     queryset = Reservation.objects.all()
     serializer_class = ReservationSerializer
+    pagination_class = ResevationPagination
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user.id)
