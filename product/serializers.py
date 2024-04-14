@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
 from product.models import (
     PlanetariumDome,
@@ -11,10 +12,10 @@ from product.models import (
 
 
 class PlanetariumDomeSerializer(serializers.ModelSerializer):
-    num_seats = serializers.IntegerField(source="capacity")
 
     class Meta:
         model = PlanetariumDome
+        read_only_fields = ("id", "num_seats")
         fields = ("id", "name", "rows", "seats_in_row", "num_seats")
 
 
@@ -22,6 +23,12 @@ class ShowThemeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShowTheme
         fields = ("id", "name")
+
+
+class ImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AstronomyShow
+        fields = ("id", "image")
 
 
 class AstronomyShowSerializer(serializers.ModelSerializer):
@@ -88,14 +95,17 @@ class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
         fields = ("id", "row", "seat", "show_session")
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Ticket.objects.all(),
+                fields=["row", "seat", "show_session"]
+            )
+        ]
 
     def validate(self, attrs):
-        if not (1 <= attrs["row"] <= attrs["show_session"].planetarium_dome.num_seats):
-            raise serializers.ValidationError(
-                {
-                    "seat": f"The seat number must be between 1 and {attrs['show_session'].planetarium_dome.num_seats}"
-                }
-            )
+        Ticket.validate(
+            attrs["row"], attrs["seat"], attrs["show_session"], serializers.ValidationError
+        )
 
 
 class ReservationSerializer(serializers.ModelSerializer):

@@ -27,9 +27,6 @@ class ShowTheme(models.Model):
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name_plural = "Show Themes"
-
 
 def create_custom_path(instance, filename: str):
     _, extension = os.path.splitext(filename)
