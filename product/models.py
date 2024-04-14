@@ -1,4 +1,9 @@
+import os
+import uuid
+
 from django.db import models, transaction
+from django.utils.text import slugify
+from rest_framework.validators import UniqueTogetherValidator
 
 from service import settings
 
@@ -9,7 +14,7 @@ class PlanetariumDome(models.Model):
     seats_in_row = models.IntegerField()
 
     @property
-    def capacity(self):
+    def num_seats(self):
         return self.rows * self.seats_in_row
 
     def __str__(self):
@@ -22,11 +27,21 @@ class ShowTheme(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = "Show Themes"
+
+
+def create_custom_path(instance, filename: str):
+    _, extension = os.path.splitext(filename)
+    filename = f"{slugify(instance.title)}-{uuid.uuid4()}{extension}"
+    return os.path.join("uploads/movies/", filename)
+
 
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     show_theme = models.ManyToManyField(ShowTheme)
+    image = models.ImageField(null=True, upload_to=create_custom_path)
 
     def __str__(self):
         return f"title: {self.title}, theme: {self.show_theme}"
@@ -67,8 +82,27 @@ class Ticket(models.Model):
     reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="tickets")
 
     class Meta:
-        unique_together = ("row", "seat", "show_session")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["row", "seat", "show_session"],
+                name="unique_ticket_row_seat_show_session")
+        ]
         ordering = ["show_session"]
+
+    @staticmethod
+    def validate(row, seat, show_session, error_to_raise):
+        if not (
+                (1 <= row <= show_session.planetarium_dome.rows) or
+                (1 <= seat <= show_session.planetarium_dome.seats_in_row)
+        ):
+            raise error_to_raise(
+                {
+                    "seat": f"The seat number must be between 1 and {show_session.planetarium_dome.num_seats}"
+                }
+            )
+
+    def clean(self):
+        Ticket.validate(self.row, self.seat, self.show_session, ValueError)
 
     def __str__(self):
         return f"{self.row}, {self.seat}, {self.show_session}, {self.reservation}"
