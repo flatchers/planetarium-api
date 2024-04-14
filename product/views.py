@@ -55,6 +55,10 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
     serializer_class = ShowSessionSerializer
     permission_classes = (IsAdminAllORIsAuthenticatedReadOnly,)
 
+    @staticmethod
+    def _param_to_int(value):
+        return [int(i) for i in value.split(",")]
+
     def get_serializer_class(self):
         if self.action == "list":
             return ShowSessionListSerializer
@@ -65,6 +69,11 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
+
+        show_themes = self.request.query_params.get("show_theme")
+        if show_themes:
+            show_themes = self._param_to_int(show_themes)
+            queryset = queryset.filter(show_themes__id__in=show_themes)
 
         if self.action in "list":
             queryset = (
