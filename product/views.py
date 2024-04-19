@@ -1,7 +1,8 @@
 from django.db.models import Count, F
-from django.shortcuts import render
-from rest_framework import viewsets, pagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import viewsets, pagination, status
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 
 from product.models import (
     PlanetariumDome,
@@ -20,7 +21,7 @@ from product.serializers import (
     AstronomyShowListSerializer,
     AstronomyShowDetailSerializer,
     ShowSessionListSerializer,
-    ShowSessionDetailSerializer,
+    ShowSessionDetailSerializer, AstronomyImageSerializer,
 )
 
 
@@ -41,23 +42,50 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
     serializer_class = AstronomyShowSerializer
     permission_classes = (IsAdminAllORIsAuthenticatedReadOnly,)
 
+    @staticmethod
+    def _param_to_int(value):
+        return [int(i) for i in value.split(",")]
+
+    def get_queryset(self):
+        queryset = self.queryset
+        show_themes = self.request.query_params.get("show_themes")
+
+        if show_themes:
+            show_themes_ids = self._param_to_int(show_themes)
+            queryset = queryset.filter(show_themes__id__in=show_themes_ids)
+
+        return queryset
+
     def get_serializer_class(self):
         if self.action == "list":
             return AstronomyShowListSerializer
         if self.action == "retrieve":
             return AstronomyShowDetailSerializer
+        if self.action == "upload_image":
+            return AstronomyImageSerializer
         else:
             return AstronomyShowSerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        permission_classes=[IsAdminUser,],
+        url_path="upload-image",
+    )
+    def upload_image(self, request, pk=None):
+        astronomy = self.get_object()
+        serializer = AstronomyImageSerializer(astronomy, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = ShowSession.objects.all()
     serializer_class = ShowSessionSerializer
     permission_classes = (IsAdminAllORIsAuthenticatedReadOnly,)
-
-    @staticmethod
-    def _param_to_int(value):
-        return [int(i) for i in value.split(",")]
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -69,11 +97,6 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = self.queryset
-
-        show_themes = self.request.query_params.get("show_theme")
-        if show_themes:
-            show_themes = self._param_to_int(show_themes)
-            queryset = queryset.filter(show_themes__id__in=show_themes)
 
         if self.action in "list":
             queryset = (
