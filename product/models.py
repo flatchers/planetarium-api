@@ -37,7 +37,7 @@ def create_custom_path(instance, filename: str):
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    show_themes = models.ManyToManyField(ShowTheme)
+    show_themes = models.ManyToManyField(ShowTheme, blank=True)
     image = models.ImageField(null=True, upload_to=create_custom_path)
 
     def __str__(self):
