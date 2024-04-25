@@ -39,15 +39,14 @@ Tests
   - python manage.py test 
 
 How to use?
-git clone https://github.com/flatchers/planetarium-api
-cd planetarium-api
-python -m venv venv
-venv\Scripts\activate
-pip install -m requirements.txt
+- git clone https://github.com/flatchers/planetarium-api
+- cd planetarium-api
+- python -m venv venv
+- venv\Scripts\activate
+- pip install -m requirements.txt
 --
 Docker Pull Command
-<button id="copyButton" onclick="copyText()">Copy Text</button>
-<textarea id="textToCopy" rows="4" cols="50">docker pull soloveykin/planetarium </textarea>
+- docker pull soloveykin/planetarium </textarea>
 --
 docker-compose up
 
