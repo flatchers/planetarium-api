@@ -1,7 +1,7 @@
 ## Project title
 
 Planetarium
-Motivation
+## Motivation
 It is one of more theme which I chose for my project in mate-academy school. I chose this project because I think that space it is our future and we need to pay more attention to space exploration and that's why I decided to make my tiny contribution
 
 ## Code style
@@ -44,11 +44,8 @@ How to use?
 - python -m venv venv
 - venv\Scripts\activate
 - pip install -m requirements.txt
---
-Docker Pull Command
 - docker pull soloveykin/planetarium
---
-docker-compose up
+- docker-compose up
 
 
 
