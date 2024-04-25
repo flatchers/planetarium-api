@@ -1,2 +1,5 @@
 .venv
 README.md
+Dockerfile
+.idea
+docker-compose.yaml
