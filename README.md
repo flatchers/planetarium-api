@@ -46,7 +46,7 @@ How to use?
 - pip install -m requirements.txt
 --
 Docker Pull Command
-- docker pull soloveykin/planetarium </textarea>
+- docker pull soloveykin/planetarium
 --
 docker-compose up
 
